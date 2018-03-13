@@ -15,6 +15,12 @@ app.get('/', (req, res) => {
 
 io.on('connection', (socket) => {
 
+    // Quand le serveur reçoit un signal de type "message" du client    
+    io.sockets.on('connection', function (socket) {
+        socket.emit('faitUneAlerte');
+    });
+
+
     // Create a new game room and notify the creator of game.
     socket.on('createGame', (data) => {
         socket.join(`room-${++rooms}`);
@@ -29,7 +35,7 @@ io.on('connection', (socket) => {
             socket.broadcast.to(data.room).emit('player1', {});
             socket.emit('player2', { name: data.name, room: data.room })
         } else {
-            socket.emit('err', { message: 'Sorry, The room is full!' });
+            console.log('La room est complete !')
         }
     });
 
@@ -43,12 +49,73 @@ io.on('connection', (socket) => {
         });
     });
 
-    /**
-       * Notify the players about the victor.
-       */
-    socket.on('gameEnded', (data) => {
-        socket.broadcast.to(data.room).emit('gameEnd', data);
+    socket.on('win', function(message) 
+    {
+        console.log("" + message);
     });
+
+    socket.on('message-newGame', function(message) 
+    {
+        console.log("" + message);
+    });
+
+    socket.on('message-joinGame', function(message) 
+    {
+        console.log("" + message);
+    });
+
+    socket.on('player', function(message) 
+    {
+        console.log("" + message);
+    });
+
+    socket.on('case1', function(message) 
+    {
+        console.log("" + message);
+    });
+
+    socket.on('case2', function(message) 
+    {
+        console.log("" + message);
+    });
+
+    socket.on('case3', function(message) 
+    {
+        console.log("" + message);
+    });
+
+    socket.on('case4', function(message) 
+    {
+        console.log("" + message);
+    });
+
+    socket.on('case5', function(message) 
+    {
+        console.log("" + message);
+    });
+
+    socket.on('case6', function(message) 
+    {
+        console.log("" + message);
+    });
+
+    socket.on('case7', function(message) 
+    {
+        console.log("" + message);
+    });
+
+    socket.on('case8', function(message) 
+    {
+        console.log("" + message);
+    });
+
+    socket.on('case9', function(message) 
+    {
+        console.log("" + message);
+    });
+
+
+
 });
 
 server.listen(process.env.PORT || 5000);

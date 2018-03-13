@@ -33,7 +33,7 @@
     // Set the currentTurn for player to turn and update UI to reflect the same.
     setCurrentTurn(turn) {
       this.currentTurn = turn;
-      const message = turn ? 'Your turn' : 'Waiting for Opponent';
+      const message = turn ? 'Votre tour' : 'En attente du joueur adverse';
       $('#turn').text(message);
     }
 
@@ -64,12 +64,12 @@
         const row = parseInt(this.id.split('_')[1][0], 10);
         const col = parseInt(this.id.split('_')[1][1], 10);
         if (!player.getCurrentTurn() || !game) {
-          alert('Its not your turn!');
+          alert('Ce n\'est pas votre tour!');
           return;
         }
 
         if ($(this).prop('disabled')) {
-          alert('This tile has already been played on!');
+          alert('la case a déja etait jouer');
           return;
         }
 
@@ -182,6 +182,8 @@
       });
       alert(message);
       location.reload();
+
+      socket.emit('win', player.getPlayerName() + ' a gagner la partie');
     }
 
     // End the game if the other player won.
@@ -195,11 +197,12 @@
   $('#new').on('click', () => {
     const name = $('#nameNew').val();
     if (!name) {
-      alert('Please enter your name.');
+      alert('Entrer votre nom !');
       return;
     }
     socket.emit('createGame', { name });
     player = new Player(name, P1);
+    socket.emit('message-newGame', player.getPlayerName() + ' a crée une partie');
   });
 
   // Join an existing game on the entered roomId. Emit the joinGame event.
@@ -207,18 +210,19 @@
     const name = $('#nameJoin').val();
     const roomID = $('#room').val();
     if (!name || !roomID) {
-      alert('Please enter your name and game ID.');
+      alert('Entrer l\'ID de la room');
       return;
     }
     socket.emit('joinGame', { name, room: roomID });
     player = new Player(name, P2);
+    socket.emit('message-joinGame', player.getPlayerName() + ' a rejoin la partie');
   });
 
   // New Game created by current client. Update the UI and create new Game var.
   socket.on('newGame', (data) => {
     const message =
-      `Hello, ${data.name}. Please ask your friend to enter Game ID: 
-      ${data.room}. Waiting for player 2...`;
+      `Bonjour, ${data.name}. 'ID de la room :' 
+      ${data.room}. En attente du joueur 2...`;
 
     // Create game for player 1
     game = new Game(data.room);
@@ -230,9 +234,10 @@
    * This event is received when opponent connects to the room.
    */
   socket.on('player1', (data) => {
-    const message = `Hello, ${player.getPlayerName()}`;
+    const message = `Bonjour, ${player.getPlayerName()}`;
     $('#userHello').html(message);
     player.setCurrentTurn(true);
+    
   });
 
   /**
@@ -240,12 +245,13 @@
    * This event is received when P2 successfully joins the game room. 
    */
   socket.on('player2', (data) => {
-    const message = `Hello, ${data.name}`;
+    const message = `Bonjour, ${data.name}`;
 
     // Create game for player 2
     game = new Game(data.room);
     game.displayBoard(message);
     player.setCurrentTurn(false);
+    
   });
 
   /**
@@ -259,6 +265,7 @@
 
     game.updateBoard(opponentType, row, col, data.tile);
     player.setCurrentTurn(true);
+    socket.emit('player', 'au tour de : ' + player.getPlayerName());
   });
 
   // If the other player wins, this event is received. Notify user game has ended.
@@ -267,10 +274,39 @@
     socket.leave(data.room);
   });
 
-  /**
-   * End the game on any err event. 
-   */
-  socket.on('err', (data) => {
-    game.endGame(data.message);
+  $('#button_00').on('click', () => {
+    socket.emit('case1', ' la case 1 a été cocher par '+ player.getPlayerName());
+  });
+
+  $('#button_01').on('click', () => {
+    socket.emit('case2', ' la case 2 a été cocher par '+ player.getPlayerName());
+  });
+
+  $('#button_02').on('click', () => {
+    socket.emit('case3', ' la case 3 a été cocher par '+ player.getPlayerName());
+  });
+
+  $('#button_10').on('click', () => {
+    socket.emit('case4', ' la case 4 a été cocher par '+ player.getPlayerName());
+  });
+
+  $('#button_11').on('click', () => {
+    socket.emit('case5', ' la case 5 a été cocher par '+ player.getPlayerName());
+  });
+
+  $('#button_12').on('click', () => {
+    socket.emit('case6', ' la case 6 a été cocher par '+ player.getPlayerName());
+  });
+
+  $('#button_20').on('click', () => {
+    socket.emit('case7', ' la case 7 a été cocher par '+ player.getPlayerName());
+  });
+
+  $('#button_21').on('click', () => {
+    socket.emit('case8', ' la case 8 a été cocher par '+ player.getPlayerName());
+  });
+
+  $('#button_22').on('click', () => {
+    socket.emit('case9', ' la case 9 a été cocher par '+ player.getPlayerName());
   });
 }());
