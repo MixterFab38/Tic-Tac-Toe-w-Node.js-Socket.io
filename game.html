@@ -4,20 +4,39 @@
     <title>Morpion</title>
     <link rel="stylesheet" href="main.css">
     <link rel="stylesheet" href="node_modules/skeleton-css/css/skeleton.css">
+    <script type="text/javascript" src="http://crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/md5.js"></script>
+    <script src="https://www.gravatar.com/205e460b479e2e5b48aec07710c08d50.json?callback=changeTitle" type="text/javascript"></script>
+
+    <script
+    src="https://code.jquery.com/jquery-2.2.3.min.js"
+    integrity="sha256-a23g1Nt4dtEYOj7bR+vTu7+T8VP13humZFBJNIYoEJo="
+    crossorigin="anonymous"></script>
+
+     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js"></script>
+
+    <script
+    src="https://code.jquery.com/jquery-2.2.3.min.js"
+    integrity="sha256-a23g1Nt4dtEYOj7bR+vTu7+T8VP13humZFBJNIYoEJo="
+    crossorigin="anonymous"></script>
   </head>
   <body>
     <div class="container">
       <div class="menu">
         <h4>Nouvelle partie</h4>
+        <img id="img"/>
         <input type="text" name="name" id="nameNew" placeholder="Entrer votre nom" required>
-        <button id="new">Nouvelle Partie</button>
+        <input type="text" name="email" id="email" placeholder="Entrer votre mail" required>
+        <button id="new" onclick="imageGravatar()">Nouvelle Partie</button>
         <br><br>
         <h4>Rejoindre</h4>
+        <img id="img2"/>
         <input type="text" name="name" id="nameJoin" placeholder="Entrer votre nom" required>
+        <input type="text" name="email" id="email2" placeholder="Entrer votre mail" required>
         <input type="text" name="room" id="room" placeholder="Entrer l'ID de la room" required>
-        <button id="join">Rejoindre</button>
+        <button id="join" onclick="imageGravatar2()">Rejoindre</button>
       </div>
       <div class="gameBoard">
+        <img id="img3" />
         <h2 id="userHello"></h2>
         <h3 id="turn"></h3>
         <table class="center">
@@ -39,8 +58,94 @@
         </table>
       </div>
     </div>
+
     <script src="node_modules/jquery/dist/jquery.min.js"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script src="main.js"></script>
+
+    <script type="text/javascript">
+
+        //Define a function to create a md5-hash of a string
+        var md5 = function(value) {
+            return CryptoJS.MD5(value).toString();
+        }
+
+        /*Event listener for every key up event in the input form element*/
+        $("#email").keyup(function () 
+        {
+
+             /*Create the hash of the email address*/
+             var value = $(this).val();
+             var hash = md5(value);
+
+             /*Change the resource url of the image element*/
+             $("#img").attr("src","https://www.gravatar.com/avatar/"+hash+".jpg");
+
+              
+             /*Send a GET request for the email and require the response to be in the JSON format*/
+             
+         });
+
+         $("#email2").keyup(function () 
+        {
+
+             /*Create the hash of the email address*/
+             var value = $(this).val();
+             var hash = md5(value);
+
+             /*Change the resource url of the image element*/
+             $("#img2").attr("src","https://www.gravatar.com/avatar/"+hash+".jpg");
+
+              
+             /*Send a GET request for the email and require the response to be in the JSON format*/
+             
+         });
+    </script>
+
+    <script type="text/javascript">
+      function changeTitle( profile ) {
+          document.title = profile.entry[0].displayName;
+      }
+    </script>
+
+    <script type="text/javascript">
+      
+      var crypto = require("crypto-js");
+      var request = require("request");
+
+      /*Generate a md5-hash of a email address and return its hexadecimal value*/
+      var hash = crypto.createHash('md5').update("example@hotmail.com").digest("hex");
+
+      /*Sends a GET request for the user profile*/
+      request("https://www.gravatar.com/"+hash+".xml",function(err,response,body){
+        if (!err){
+          console.log(body);
+        }else{
+          console.log("Error: "+err);
+        }
+      })
+
+      /*Sends a GET request for the avatar*/
+      request("https://www.gravatar.com/avatar/"+hash+".jpg",function(err,response,body){
+        if (!err){
+          console.log("Got image: "+body);
+        }else{
+          console.log("Error: "+err);
+        }
+      })
+    </script>
+
+    <script type="text/javascript">
+      function imageGravatar() {
+        $('#img3').attr('src', document.getElementById("img").src);
+      }
+    </script>
+
+    <script type="text/javascript">
+      function imageGravatar2() {
+        $('#img3').attr('src', document.getElementById("img2").src);
+      }
+    </script>
+
   </body>
 </html>
