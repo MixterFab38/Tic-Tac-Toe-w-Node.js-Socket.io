@@ -9,8 +9,26 @@ var rooms = 0;
 
 app.use(express.static('.'));
 
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'game.html'));
+app.get('/', function(req, res) {
+
+    var newGame = "Nouvelle partie";
+    var join = "Rejoindre";
+    var name = "Entrer votre nom";
+    var email = "Entrer votre mail";
+    var idRoom = "Entrer l'ID de la room";
+
+    res.render('game.ejs', {
+        newGame: newGame,
+        join: join,
+        name: name,
+        email: email,
+        idRoom: idRoom,
+    });
+});
+
+app.get('/', function(req, res) {
+
+    res.render('main.js');
 });
 
 io.on('connection', (socket) => {
@@ -38,7 +56,6 @@ io.on('connection', (socket) => {
             console.log('La room est complete !')
         }
     });
-
     /**
        * Handle the turn played by either player and notify the other.
        */
@@ -50,6 +67,11 @@ io.on('connection', (socket) => {
     });
 
     socket.on('win', function(message) 
+    {
+        console.log("" + message);
+    });
+
+     socket.on('loos', function(message) 
     {
         console.log("" + message);
     });
