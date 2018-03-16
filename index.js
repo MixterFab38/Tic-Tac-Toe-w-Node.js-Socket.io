@@ -66,6 +66,10 @@ io.on('connection', (socket) => {
         });
     });
 
+    socket.on('gameEnded', (data) => {
+        socket.broadcast.to(data.room).emit('gameEnd', data);
+    });
+
     socket.on('win', function(message) 
     {
         console.log("" + message);
@@ -86,10 +90,10 @@ io.on('connection', (socket) => {
         console.log("" + message);
     });
 
-    socket.on('player', function(message) 
+    /*socket.on('player', function(message) 
     {
         console.log("" + message);
-    });
+    });*/
 
     socket.on('case1', function(message) 
     {

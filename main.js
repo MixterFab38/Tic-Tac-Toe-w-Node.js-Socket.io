@@ -155,8 +155,6 @@
         {
           if ((winningPosition & currentPlayerPositions) === winningPosition) {
             game.announceWinner();
-            location.reload();
-            room.leave
           }
         });
         
@@ -193,6 +191,7 @@
         message,
       });
       alert(message);
+      location.reload();
       socket.emit('win', player.getPlayerName() + ' a gagner la partie');
     }
 
@@ -275,7 +274,7 @@
 
     game.updateBoard(opponentType, row, col, data.tile);
     player.setCurrentTurn(true);
-    socket.emit('player', 'au tour de : ' + player.getPlayerName());
+    //socket.emit('player', 'au tour de : ' + player.getPlayerName());
   });
 
   // If the other player wins, this event is received. Notify user game has ended.
