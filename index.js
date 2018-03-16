@@ -39,13 +39,13 @@ io.on('connection', (socket) => {
     });
 
 
-    // Create a new game room and notify the creator of game.
+    // Crée une nouvelle partie
     socket.on('createGame', (data) => {
         socket.join(`room-${++rooms}`);
         socket.emit('newGame', { name: data.name, room: `room-${rooms}` });
     });
 
-    // Connect the Player 2 to the room he requested. Show error if room full.
+    // Connect le joueur 2 a la room et retourne une erreur
     socket.on('joinGame', function (data) {
         var room = io.nsps['/'].adapter.rooms[data.room];
         if (room && room.length === 1) {
@@ -56,15 +56,17 @@ io.on('connection', (socket) => {
             console.log('La room est complete !')
         }
     });
-    /**
-       * Handle the turn played by either player and notify the other.
-       */
+    /*
+    Manipuler le tour joué par l'un ou l'autre joueur et notifier l'autre.
+    */
     socket.on('playTurn', (data) => {
         socket.broadcast.to(data.room).emit('turnPlayed', {
             tile: data.tile,
             room: data.room
         });
     });
+
+    //Envoi de message sur la console
 
     socket.on('gameEnded', (data) => {
         socket.broadcast.to(data.room).emit('gameEnd', data);
@@ -89,11 +91,6 @@ io.on('connection', (socket) => {
     {
         console.log("" + message);
     });
-
-    /*socket.on('player', function(message) 
-    {
-        console.log("" + message);
-    });*/
 
     socket.on('case1', function(message) 
     {

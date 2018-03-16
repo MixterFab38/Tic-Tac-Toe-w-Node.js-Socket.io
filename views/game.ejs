@@ -66,28 +66,26 @@
 
     <script type="text/javascript">
 
-        //Define a function to create a md5-hash of a string
+        //function pour créer un MD5 hash
         var md5 = function(value) {
             return CryptoJS.MD5(value).toString();
         }
 
-        /*Event listener for every key up event in the input form element*/
         $("#email").keyup(function () {
-             /*Create the hash of the email address*/
+             /*créer le hash pour l'adresse email*/
              var value = $(this).val();
              var hash = md5(value);
-             /*Change the resource url of the image element*/
+             /*Change l'url de l'image*/
              $("#img").attr("src","https://www.gravatar.com/avatar/"+hash+".jpg"); 
-             /*Send a GET request for the email and require the response to be in the JSON format*/ 
+             
          });
 
          $("#email2").keyup(function () {
-             /*Create the hash of the email address*/
+             /*créer le hash pour l'adresse email*/
              var value = $(this).val();
              var hash = md5(value);
-             /*Change the resource url of the image element*/
-             $("#img2").attr("src","https://www.gravatar.com/avatar/"+hash+".jpg");           
-             /*Send a GET request for the email and require the response to be in the JSON format*/    
+             /*Change l'url de l'image*/
+             $("#img2").attr("src","https://www.gravatar.com/avatar/"+hash+".jpg");            
          });
     </script>
 
@@ -97,12 +95,13 @@
       }
     </script>
 
+
     <script type="text/javascript">
       var crypto = require("crypto-js");
       var request = require("request");
-      /*Generate a md5-hash of a email address and return its hexadecimal value*/
+      /*Genere un md5-hash de l'email address et le retour en hexadecimal*/
       var hash = crypto.createHash('md5').update("example@hotmail.com").digest("hex");
-      /*Sends a GET request for the user profile*/
+      /*Envoi une requetes*/
       request("https://www.gravatar.com/"+hash+".xml",function(err,response,body){
         if (!err) {
           console.log(body);
@@ -110,7 +109,7 @@
           console.log("Error: "+err);
         }
       })
-      /*Sends a GET request for the avatar*/
+      /*Envoi une requetes*/
       request("https://www.gravatar.com/avatar/"+hash+".jpg",function(err,response,body){
         if (!err) {
           console.log("Got image: "+body);
@@ -121,12 +120,15 @@
     </script>
 
     <script type="text/javascript">
+
+      //Permet d'associer a l'id image 3 la source de l'id img afin que le joueur 1 ou 2 retrouve son logo gravatar
       function imageGravatar() {
         $('#img3').attr('src', document.getElementById("img").src);
       }
     </script>
 
     <script type="text/javascript">
+       //Permet d'associer a l'id image 3 la source de l'id img afin que le joueur 1 ou 2 retrouve son logo gravatar
       function imageGravatar2() {
         $('#img3').attr('src', document.getElementById("img2").src);
       }

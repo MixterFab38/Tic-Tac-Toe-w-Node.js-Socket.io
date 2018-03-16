@@ -15,12 +15,12 @@
       this.playsArr = 0;
     }
 
+    // Chiffres permettant de gagner
     static get wins() {
       return [7, 56, 448, 73, 146, 292, 273, 84];
     }
 
-    // Set the bit of the move played by the player
-    // tileValue - Bitmask used to set the recently played move.
+    // Définit le coup joué par le joueur
     updatePlaysArr(tileValue) {
       this.playsArr += tileValue;
     }
@@ -29,7 +29,7 @@
       return this.playsArr;
     }
 
-    // Set the currentTurn for player to turn and update UI to reflect the same.
+    // Régle le tour pour que le joueur passe au suivant et met à jour l'interface utilisateur pour refléter la même chose.
     setCurrentTurn(turn) {
       this.currentTurn = turn;
       const message = turn ? 'Votre tour' : 'En attente du joueur adverse';
@@ -49,7 +49,6 @@
     }
   }
 
-  // roomId Id of the room in which the game is running on the server.
   class Game {
     constructor(roomId) {
       this.roomId = roomId;
@@ -57,7 +56,7 @@
       this.moves = 0;
     }
 
-    // Create the Game board by attaching event listeners to the buttons.
+    // Créez le plateau de jeu en attachant des événements aux boutons
     createGameBoard() {
       function tileClickHandler() {
         const row = parseInt(this.id.split('_')[1][0], 10);
@@ -72,7 +71,7 @@
           return;
         }
 
-        // Update board after your turn.
+        // met a jour le plateau apres la fin du tour
         game.playTurn(this);
         game.updateBoard(player.getPlayerType(), row, col, this.id);
 
@@ -89,21 +88,14 @@
         }
       }
     }
-    // Remove the menu from DOM, display the gameboard and greet the player.
+    // Retire le plateeau en debut de partie
     displayBoard(message) {
       $('.menu').css('display', 'none');
       $('.gameBoard').css('display', 'block');
       $('#userHello').html(message);
       this.createGameBoard();
     }
-    /**
-     * Update game board UI
-     *
-     * @param {string} type Type of player(X or O)
-     * @param {int} row Row in which move was played
-     * @param {int} col Col in which move was played
-     * @param {string} tile Id of the the that was clicked
-     */
+ 
     updateBoard(type, row, col, tile) {
       $(`#${tile}`).text(type).prop('disabled', true);
       this.board[row][col] = type;
@@ -114,11 +106,11 @@
       return this.roomId;
     }
 
-    // Send an update to the opponent to update their UI's tile
+    // envoie les modification a l'adversaire
     playTurn(tile) {
       const clickedTile = $(tile).attr('id');
 
-      // Emit an event to update other player that you've played your turn.
+      // Emit un evenment pour indiquer que l'autre joueur a jouer.
       socket.emit('playTurn', {
         tile: clickedTile,
         room: this.getRoomId(),
@@ -126,13 +118,12 @@
     }
     /**
      *
-     * To determine a win condition, each square is "tagged" from left
-     * to right, top to bottom, with successive powers of 2.  Each cell
-     * thus represents an individual bit in a 9-bit string, and a
-     * player's squares at any given time can be represented as a
-     * unique 9-bit value. A winner can thus be easily determined by
-     * checking whether the player's current 9 bits have covered any
-     * of the eight "three-in-a-row" combinations.
+     * Pour déterminer une condition de victoire, chaque case est "marquée" de gauche
+     * à droite et de haut en bas, avec des puissances successives de 2. Chaque cellule
+     * représente donc un bit individuel dans une chaîne de 9 bits, et
+     * Les cases du joueur à un moment donné peuvent être représentées comme
+     * valeur unique de 9 bits. Un gagnant peut donc être facilement déterminé par
+     * si les 9 bits actuels du joueur ont couvert une des combinaison".
      *
      *     273                 84
      *        \               /
@@ -144,9 +135,10 @@
      *       =================
      *         73   146   292
      *
-     *  We have these numbers in the Player.wins array and for the current
-     *  player, we've stored this information in playsArr.
      */
+
+
+      // verifie si le joueur est gagnant et annonce le vainqueur
       checkWinner() 
       {
         const currentPlayerPositions = player.getPlaysArr();
@@ -158,7 +150,7 @@
           }
         });
         
-        const tieMessage = 'Game Tied :(';
+        const tieMessage = 'Égalité';
         if (this.checkTie()) 
         {
           socket.emit('gameEnded', 
@@ -171,19 +163,12 @@
         }
     }
 
-     checkLooser() 
-      { if(room.length < 1)
-        {
-          location.reload();
-        } 
-    }
-
     checkTie() {
       return this.moves >= 9;
     }
 
-    // Announce the winner if the current client has won. 
-    // Broadcast this on the room to let the opponent know.
+    // Announce le vainqueur. 
+
     announceWinner() {
       const message = `${player.getPlayerName()} wins!`;
       socket.emit('gameEnded', {
@@ -195,14 +180,14 @@
       socket.emit('win', player.getPlayerName() + ' a gagner la partie');
     }
 
-    // End the game if the other player won.
+    // Arrete la partie si un autre joueur a gagner
     endGame(message) {
       alert(message);
       location.reload();
     }
   }
 
-  // Create a new game. Emit newGame event.
+  // Créer une nouvelle partie
   $('#new').on('click', () => {
     const name = $('#nameNew').val();
     if (!name) {
@@ -214,7 +199,7 @@
     socket.emit('message-newGame', player.getPlayerName() + ' a crée une partie');
   });
 
-  // Join an existing game on the entered roomId. Emit the joinGame event.
+  // Permet de rejoindre une partie créer et de mettre a jour les textes.
   $('#join').on('click', () => {
     const name = $('#nameJoin').val();
     const roomID = $('#room').val();
@@ -227,20 +212,21 @@
     socket.emit('message-joinGame', player.getPlayerName() + ' a rejoin la partie');
   });
 
-  // New Game created by current client. Update the UI and create new Game var.
+
+ // créer une partie pour le joueur 1
   socket.on('newGame', (data) => {
     const message =
       `'Bonjour, ${data.name}. 'ID de la room :' 
       ${data.room}. En attente du joueur 2...`;
 
-    // Create game for player 1
+   
     game = new Game(data.room);
     game.displayBoard(message);
   });
 
+
   /**
-   * If player creates the game, he'll be P1(X) and has the first turn.
-   * This event is received when opponent connects to the room.
+   * Si le joueur a creer une partie il sera le joueur avec les croix
    */
   socket.on('player1', (data) => {
     const message = `Bonjour, ${player.getPlayerName()}`;
@@ -250,8 +236,7 @@
   });
 
   /**
-   * Joined the game, so player is P2(O). 
-   * This event is received when P2 successfully joins the game room. 
+   * Si le joueur deux rejoind une partie , il sera les ronds
    */
   socket.on('player2', (data) => {
     const message = `Bonjour, ${data.name}`;
@@ -264,8 +249,7 @@
   });
 
   /**
-   * Opponent played his turn. Update UI.
-   * Allow the current player to play now. 
+   * Met a jour l'interface apres un tour jouer et previent l'adversaire que c'est a sn tour
    */
   socket.on('turnPlayed', (data) => {
     const row = data.tile.split('_')[1][0];
@@ -274,10 +258,9 @@
 
     game.updateBoard(opponentType, row, col, data.tile);
     player.setCurrentTurn(true);
-    //socket.emit('player', 'au tour de : ' + player.getPlayerName());
   });
 
-  // If the other player wins, this event is received. Notify user game has ended.
+  // Si l'autre joueur gagne, cet événement est reçu. Notifier l'utilisateur que le jeu est terminé.
   socket.on('gameEnd', (data) => {
     game.endGame(data.message);
     socket.leave(data.room);
